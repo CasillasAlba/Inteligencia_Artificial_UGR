@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<aiml version="2.0">
+	<!-- File: simulatiempo.aiml -->
+	<!-- Author: Raul -->
+	<!-- Last modified: January 30, 2019 -->
+
+	<!-- Se han modificado y aniadido funciones. Hechas por: Alba Casillas Rodriguez -->
+
+<!-- Hace avanzar el tiempo actual tantos minutos como indica el argumento -->
+<category>
+<pattern> SIMUL <set>number</set> </pattern>
+<template>
+   <condition name="reproduccionactivada">
+		<li value="1">
+				     <condition name="tiempo">
+				  			<li value="unknown"> 
+				  				<think>
+							  		<set name="tiempo">0</set>
+							  	</think>
+							</li>
+				     </condition>
+				
+							
+						<think>	
+							TEMPORADA <get name="latemporada"/>
+							SERIE <get name="LaSerie"/>
+					   	<set var="lista"><map><name><get name="LaSerie"/></name><get name="latemporada"/></map></set>
+						   <set var="lista"><srai> decode_fields <get var="lista"/></srai></set>
+						   <set var="contador">1</set>
+						   <set var="numerocap"><srai> FINDITEM <get name="nombrecap"/> IN <get var="lista"/></srai></set> 
+						</think>  
+				
+					   <!-- HALLAR DURACION TOTAL DE UN CAPITULO -->	
+					   <condition var="contador">
+					   	<li><value><get var="numerocap"/></value>
+					  
+					  			<think>
+						   		<set var="lista"><srai> REMAIN <get var="lista"/></srai></set>
+									<set var="durtotal"><srai> TOP <get var="lista"/> </srai></set>
+								</think>
+				
+							</li>
+							
+							<li>
+					
+								<think>
+									<set var="contador"><map name="successor"><get var="contador"/></map></set>
+									<set var="lista"><srai> REMAIN <get var="lista"/></srai></set>
+								</think>
+									
+									<loop/>
+							</li>
+						</condition>
+					   	
+				   	<think>
+					     <set var="indice">0</set>
+					     <set var="contadorreal"><get name="mincap"/></set>
+					     <set var="capterminado"></set>
+				 		</think>
+				     
+					   <!-- Ciclo que va incrementando el tiempo de minuto en minuto -->
+					   
+					   <condition var="indice">
+					
+					      <!-- Opcion de salida del ciclo: cuando indice valga el valor del tiempo indicado en SIMUL -->
+					      
+					      <li> <value><star index="1"/></value>
+					   
+					   		<think>
+						      	<set name="mincap"><get var="contadorreal"/></set>
+						      	
+									<set var="capitulo"><get name="nombrecap"/>@<get name="mincap"/></set>
+							
+								
+								<modifymap>
+									<name><get name="usuario"/></name>
+									<key><get name="LaSerie"/></key>
+									<value><get var="capitulo"/></value>
+								</modifymap>
+								
+								<condition name="modificarambosmap">
+									<li value="1">
+										<modifymap>
+											<name><get name="otrouser"/></name>
+											<key><get name="LaSerie"/></key>
+											<value><get var="capitulo"/></value>
+										</modifymap>
+									</li>
+								</condition>
+								</think>
+							
+							</li>
+					      
+					      <li>
+					      
+					      	<think>
+						      	<set name="tiempo"><map name="successor"><get name="tiempo"/></map></set>
+						         <set var="indice"><map name="successor"><get var="indice"/></map></set>
+						         <set var="contadorreal"><map name="successor"><get var="contadorreal"/></map></set>
+					        </think>
+					         
+					         <condition var="contadorreal">
+					         
+					         	<li><value><get var="durtotal"/></value> 
+					         		<think>
+											<set var="capterminado">1</set>
+										</think>
+									</li>
+									
+					         </condition>	
+					         		
+					       	  <loop/> 
+					      </li>
+					      
+					   </condition>
+					
+						   
+				El tiempo total transcurrido es de <get name="tiempo"/> minutos
+					   
+					   <condition var="capterminado">      	
+				      	<li value="1">
+				Capitulo en reproduccion terminado
+				      		
+				      		<think>
+				      			<set var="capitulo"><get name="nombrecap"/>@<get var="durtotal"/></set>
+				      		</think>
+				      		
+								<modifymap>
+									<name><get name="usuario"/></name>
+									<key><get name="LaSerie"/></key>
+									<value><get var="capitulo"/></value>
+								</modifymap>
+								
+				      	</li>   
+							
+							<li>
+				Capitulo en reproduccion va por el minuto <get name="mincap"/>
+				      	</li>   	
+					   </condition>
+			</li>
+				
+			<li>
+No se esta reproduciendo ningun capitulo
+			</li>
+		</condition>	
+</template>
+</category>
+
+
+<!-- Una variante de la accion SIMUL para incluir algo como SIMUL 10 minutos -->
+<category>
+<pattern> SIMUL <set>number</set> ^ </pattern>
+<template>
+      <srai>SIMUL <star index="1"/></srai>
+</template>
+</category>
+
+<category>
+<pattern> avanza <set>number</set> ^ </pattern>
+<template>
+      <srai>SIMUL <star index="1"/></srai>
+</template>
+</category>
+
+
+<!-- Detectar un uso incorrecto del comando SIMUL -->
+<category>
+<pattern> SIMUL * </pattern>
+<template>
+El parametro que se le pasa a SIMUL debe ser un numero
+</template>
+</category>
+
+
+<!-- Retroceder en el tiempo -->
+<category>
+<pattern> Retrocede * (minutos) </pattern>
+<template>
+	   <condition name="reproduccionactivada">
+		<li value="1">
+			<think>
+				<set var="retrocedemin"><star/></set>
+				<set var="contador">0</set>
+				<set var="noretroceder">0</set>
+				
+				
+				<condition var="contador">
+					<li><value><get var="retrocedemin"/></value>
+					
+				      <set var="capitulo"><get name="nombrecap"/>@<get name="mincap"/></set>
+			      
+			      	
+						<modifymap>
+							<name><get name="usuario"/></name>
+							<key><get name="LaSerie"/></key>
+							<value><get var="capitulo"/></value>
+						</modifymap>
+					
+					</li>
+					
+					<li>
+						<set var="contador"><map name="successor"><get var="contador"/></map></set>
+						<set name="mincap"><map name="predecessor"><get name="mincap"/></map></set>
+						
+						<condition name="mincap">
+							<li value="0">
+								<set var="noretroceder">1</set>
+							</li>
+						</condition>
+						<loop/>				
+					
+					</li>
+				</condition>
+			</think>
+			
+			<condition var="noretroceder">
+				<li value="0">
+		Capitulo en reproduccion va por el minuto <get name="mincap"/>
+				</li>
+				
+				<li>
+		No puedes retroceder mas ya que has llegado al minuto 0
+					
+					<think>
+		      			<set var="capitulo"><get name="nombrecap"/>@0</set>
+		      	</think>
+		      	
+					<modifymap>
+						<name><get name="usuario"/></name>
+						<key><get name="LaSerie"/></key>
+						<value><get var="capitulo"/></value>
+					</modifymap>
+				</li>
+			</condition>
+		</li>
+	
+		<li>
+No se esta reproduciendo ningun capitulo 
+		</li>
+		
+	</condition>
+	
+	</template>
+</category>
+			
+			
+
+
+</aiml>

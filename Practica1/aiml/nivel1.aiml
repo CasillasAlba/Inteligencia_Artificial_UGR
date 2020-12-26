@@ -1,0 +1,889 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<aiml version="2.0">
+
+
+
+<!--HECHO POR: ALBA CASILLAS RODRIGUEZ		CURSO: 2A -->
+
+
+<!--Nivel 1 -->
+
+<!-- ANIADIR UNA SERIE NUEVA -->
+
+<category> 
+	<pattern> [Aniad+ Sub+ Inlcuy+] la serie * </pattern>
+	<template> 
+		<think>
+			<set name="LaSerie"><srai> CODE <star/></srai></set>
+			
+			<set var="respuesta"><srai> FINDITEM <get name="LaSerie"/> IN <readset>seriesnetflix</readset></srai></set>
+		</think>
+		
+		<condition var="respuesta">
+			<li value="0">
+					<think>
+					<set var="respuesta2"><srai> FINDITEM <get name="LaSerie"/> IN <readset>primevideo</readset></srai></set>
+					</think>
+					
+					<condition var="respuesta2">
+						<li value="0">
+De acuerdo. Ha creado un archivo txt con el nombre de la serie? [Si/No]
+							
+							<think>
+							<set name="topic">archivocreado</set>	
+							</think>
+												
+						</li>
+						
+						<li>
+Esta serie se encuentra ya disponible en la plataforma Prime Video
+						</li>
+						
+					</condition>
+			</li>
+			
+			<li>
+Esta serie se encuentra ya disponible en la plataforma Netflix
+			</li>
+			
+		</condition>
+	</template>
+</category>
+
+
+
+
+
+
+
+
+
+<!-- TOPIC PARA LA PREGUNTA DE SI HAY UN ARCHIVO TXT CON EL NOMBRE DE LA SERIE A ANIADIR -->
+
+<topic name="archivocreado">
+
+<category>
+	<pattern> * </pattern>
+	<template>
+	<think>
+		<set var="respuesta"><star/></set>
+	</think>
+		
+		<condition var="respuesta">
+			<li value="No">
+Vale.
+Para aniadir una serie cree antes un archivo txt con el nombre de la serie y pideme que la aniada.
+			</li>
+			
+			<li value="Si">
+				<think>
+					<addtomap>
+						<name>no_mayusculas</name>
+						<key><get name="LaSerie"/></key>
+						<value><get name="LaSerie"/></value>
+					</addtomap>
+				</think>
+				
+De acuerdo. Voy a <set name="topic"> aniadir </set> la serie <srai> DECODE <get name="LaSerie"/></srai>
+Dime la plataforma.
+			</li>
+			
+		</condition>
+		
+	</template>
+</category>
+
+</topic>
+	
+
+
+
+
+
+
+
+
+
+
+<!-- PEDIDA DE INFORMACION PARA RELLENAR EL MAP CON LA NUEVA SERIE -->
+
+<topic name ="aniadir">
+
+<!-- PIDE LA PLATAFORMA -->
+
+<category>
+	<pattern> * </pattern>
+	<template>
+		<think>
+		<set var="plataforma"><srai> CODE <star/></srai></set>
+		</think>
+		<condition var="plataforma">
+			<li value="Netflix">
+			
+				<addtoset>
+					<name>seriesnetflix</name>
+					<key><get name="LaSerie"/></key>
+				</addtoset>
+						
+				<addtomap>
+					<name><srai>code <get name="LaSerie"/></srai></name>
+					<key>plataforma</key>
+					<value><get var="plataforma"/></value>
+				</addtomap>
+				
+				<think>
+				<set name="topic">sgenero</set>
+				</think>
+				
+Dime a que generos pertenece.
+				
+			</li>
+			
+			<li value="Prime_Video">
+			
+				<addtoset>
+					<name>primevideo</name>
+					<key><get name="LaSerie"/></key>
+				</addtoset>
+				
+				<addtomap>
+					<name><srai>code <get name="LaSerie"/></srai></name>
+					<key>plataforma</key>
+					<value><get var="plataforma"/></value>
+				</addtomap>
+				
+				<think>
+				<set name="topic">sgenero</set>
+				</think>
+				
+Dime a que generos pertenece.
+				
+			</li>
+			
+			<li>
+La plataforma que usted ha dicho no se encuentra disponible. Diga otra (Netflix o Prime Video).
+				<!--Como no se hace ningun cambio de topic, la unica opcion disponible es que digas otra plataforma -->
+			</li>
+		</condition>
+	</template>
+</category>
+
+</topic>
+
+
+
+
+
+
+
+
+
+
+
+
+<topic name ="sgenero" >
+
+<!-- PIDE EL GENERO -->
+
+<category>
+	<pattern> * </pattern>
+	<template>
+		 <think>
+			<!-- Aniado los elementos de esta forma ya que usando modifymap reescribe el valor que corresponde a la clave dada -->
+			<!-- y al hacer un addtomap por cada elemento solo guarda el primer valor, que es el que se aniade al crear la clave -->
+			
+			
+			<!-- Guardo en una var. local "lista" los generos que el usuario ha introducido -->
+			<set var="lista"><star/></set>
+			
+			<!-- Guardo la primera palabra (TOP) en una var. local llamada "todosgeneros" -->
+			<set var="todosgeneros">
+				<srai>TOP <get var="lista"/></srai>
+			</set>
+			
+			<!-- Actualizo la variable "lista" devolviendola sin la primera palabra -->
+			<set var="lista"> 
+		 		<srai>REMAIN <get var="lista"/></srai>
+		 	</set>
+		 	
+		 	<!-- Genero una variable "quedan" que actua a modo de contador -->
+			<set var="quedan"><srai>COUNT <get var="lista"/></srai></set>
+			
+			<condition var="quedan">
+			
+				<!-- El bucle para cuando "quedan" == 0, es decir, que no habra mas elementos que aniadir -->
+				<li value="0"></li>
+				
+				
+				<li>
+				
+					<!-- Guardo en "item" la primera palabra de la lista -->
+					<set var="item">
+						<srai>TOP <get var="lista"/></srai>
+					</set>
+					
+					<condition var="item">
+					
+						<!-- Si "item" == "y" borro el elemento ya que no nos sirve y actualizo la variable "item" -->
+						<li value="y">
+							<set var="lista"> 
+						 		<srai>REMAIN <get var="lista"/></srai>
+						 	</set>
+						 	
+						 	<set var="item">
+						 		<srai>TOP <get var="lista"/></srai>
+						 	</set>
+						  	
+						</li>
+						
+					</condition>
+					
+					<!-- Actualizo la variable "todosgeneros" que ya contenia la primera palabra de la lista -->
+					<!-- y le aniado el nuevo elemento ("item") separandolos por un @ -->
+					<set var="todosgeneros">
+						<get var="todosgeneros"/>@<get var="item"/>
+					</set>
+					
+					<!-- Devuelvo la lista sin la primera palabra, es decir, la ultima aniadida -->
+				 	<set var="lista"> 
+				 		<srai>REMAIN <get var="lista"/></srai>
+				 	</set>
+				 	
+				 	<!-- Actualizo el contador -->
+				 	<set var="quedan">
+				 		<srai>COUNT <get var="lista"/></srai>
+				 	</set>
+					
+					<!-- Se repetira hasta que no queden elementos en la lista -->
+					<loop/>
+				</li>
+				
+			<!-- CONDITION QUEDAN -->
+			</condition>
+			
+		<!-- Finalmente aniado todos los elementos guardados -->	
+	   <addtomap>
+			<name><srai>code <get name="LaSerie"/></srai></name>
+			<key>genero</key>
+			<value><get var="todosgeneros"/></value>
+		</addtomap>
+		
+		<set name="topic">sidioma</set>
+		
+		</think>
+		
+		Dime la lista de idiomas en las que se puede escuchar la serie.
+		
+	</template>
+</category>
+
+</topic>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<topic name ="sidioma" >
+
+<!-- PIDE EL IDIOMA -->
+<category>
+	<pattern> * </pattern>
+	<template>
+		  <think>
+		
+			<!-- Guardo en una var. local "lista" los generos que el usuario ha introducido -->
+			<set var="lista"><star/></set>
+			
+			<!-- Guardo la primera palabra (TOP) en una var. local llamada "todosidiomas" -->
+			<set var="todosidiomas">
+				<srai>TOP <get var="lista"/></srai>
+			</set>
+			
+			<!-- Actualizo la variable "lista" devolviendola sin la primera palabra -->
+			<set var="lista"> 
+		 		<srai>REMAIN <get var="lista"/></srai>
+		 	</set>
+		 	
+		 	<!-- Genero una variable "quedan" que actua a modo de contador -->
+			<set var="quedan"><srai>COUNT <get var="lista"/></srai></set>
+			
+			<condition var="quedan">
+			
+				<!-- El bucle para cuando "quedan" == 0, es decir, que no habra mas elementos que aniadir -->
+				<li value="0"></li>
+				
+				
+				<li>
+				
+					<!-- Guardo en "item" la primera palabra de la lista -->
+					<set var="item">
+						<srai>TOP <get var="lista"/></srai>
+					</set>
+					
+					<condition var="item">
+					
+						<!-- Si "item" == "y" borro el elemento ya que no nos sirve y actualizo la variable "item" -->
+						<li value="y">
+							<set var="lista"> 
+						 		<srai>REMAIN <get var="lista"/></srai>
+						 	</set>
+						 	
+						 	<set var="item">
+						 		<srai>TOP <get var="lista"/></srai>
+						 	</set>
+						  	
+						</li>
+						
+											
+						<!-- Si "item" == "e" borro el elemento ya que no nos sirve y actualizo la variable "item" -->
+						<li value="e">
+							<set var="lista"> 
+						 		<srai>REMAIN <get var="lista"/></srai>
+						 	</set>
+						 	
+						 	<set var="item">
+						 		<srai>TOP <get var="lista"/></srai>
+						 	</set>
+						  	
+						</li>
+						
+					</condition>
+					
+					<!-- Actualizo la variable "todosidiomas" que ya contenia la primera palabra de la lista -->
+					<!-- y le aniado el nuevo elemento ("item") separandolos por un @ -->
+					<set var="todosidiomas">
+						<get var="todosidiomas"/>@<get var="item"/>
+					</set>
+					
+					<!-- Devuelvo la lista sin la primera palabra, es decir, la ultima aniadida -->
+				 	<set var="lista"> 
+				 		<srai>REMAIN <get var="lista"/></srai>
+				 	</set>
+				 	
+				 	<!-- Actualizo el contador -->
+				 	<set var="quedan">
+				 		<srai>COUNT <get var="lista"/></srai>
+				 	</set>
+					
+					<!-- Se repetira hasta que no queden elementos en la lista -->
+					<loop/>
+				</li>
+				
+			<!-- CONDITION QUEDAN -->
+			</condition>
+			
+			<!-- Finalmente aniado todos los elementos guardados -->	
+		   <addtomap>
+				<name><srai>code <get name="LaSerie"/></srai></name>
+				<key>idiomas</key>
+				<value><get var="todosidiomas"/></value>
+			</addtomap>
+	
+		<set name="topic">ssub</set>
+		
+	  </think>
+	  
+		Dime la lista de subtitulos.
+		
+	</template>
+</category>
+
+</topic>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<topic name ="ssub" >
+
+<!-- PIDE LOS SUBTITULOS -->
+<category>
+	<pattern> * </pattern>
+	<template>
+	
+		<think>
+
+			<!-- Guardo en una var. local "lista" los generos que el usuario ha introducido -->
+			<set var="lista"><star/></set>
+			
+			<!-- Guardo la primera palabra (TOP) en una var. local llamada "todossubs" -->
+			<set var="todossubs">
+				<srai>TOP <get var="lista"/></srai>
+			</set>
+			
+			<!-- Actualizo la variable "lista" devolviendola sin la primera palabra -->
+			<set var="lista"> 
+		 		<srai>REMAIN <get var="lista"/></srai>
+		 	</set>
+		 	
+		 	<!-- Genero una variable "quedan" que actua a modo de contador -->
+			<set var="quedan"><srai>COUNT <get var="lista"/></srai></set>
+			
+			<condition var="quedan">
+			
+				<!-- El bucle para cuando "quedan" == 0, es decir, que no habra mas elementos que aniadir -->
+				<li value="0"></li>
+				
+				
+				<li>
+				
+					<!-- Guardo en "item" la primera palabra de la lista -->
+					<set var="item">
+						<srai>TOP <get var="lista"/></srai>
+					</set>
+					
+					<condition var="item">
+					
+						<!-- Si "item" == "y" borro el elemento ya que no nos sirve y actualizo la variable "item" -->
+						<li value="y">
+							<set var="lista"> 
+						 		<srai>REMAIN <get var="lista"/></srai>
+						 	</set>
+						 	
+						 	<set var="item">
+						 		<srai>TOP <get var="lista"/></srai>
+						 	</set>
+						  	
+						</li>
+						
+						<!-- Si "item" == "e" borro el elemento ya que no nos sirve y actualizo la variable "item" -->
+						<li value="e">
+							<set var="lista"> 
+						 		<srai>REMAIN <get var="lista"/></srai>
+						 	</set>
+						 	
+						 	<set var="item">
+						 		<srai>TOP <get var="lista"/></srai>
+						 	</set>
+						  	
+						</li>
+						
+					</condition>
+					
+					<!-- Actualizo la variable "todosubs" que ya contenia la primera palabra de la lista -->
+					<!-- y le aniado el nuevo elemento ("item") separandolos por un @ -->
+					<set var="todossubs">
+						<get var="todossubs"/>@<get var="item"/>
+					</set>
+					
+					<!-- Devuelvo la lista sin la primera palabra, es decir, la ultima aniadida -->
+				 	<set var="lista"> 
+				 		<srai>REMAIN <get var="lista"/></srai>
+				 	</set>
+				 	
+				 	<!-- Actualizo el contador -->
+				 	<set var="quedan">
+				 		<srai>COUNT <get var="lista"/></srai>
+				 	</set>
+					
+					<!-- Se repetira hasta que no queden elementos en la lista -->
+					<loop/>
+				</li>
+				
+			<!-- CONDITION QUEDAN -->
+			</condition>
+			
+			<!-- Finalmente aniado todos los elementos guardados -->	
+		   <addtomap>
+				<name><srai>code <get name="LaSerie"/></srai></name>
+				<key>subtitulos</key>
+				<value><get var="todossubs"/></value>
+			</addtomap>
+
+			
+		<set name="topic">sdescp</set>
+		
+		</think>
+		
+		Digame la descripcion de la serie.
+	</template>
+</category>
+
+</topic>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<topic name ="sdescp" >
+
+<!-- PIDE LA DESCRIPCION -->
+<category>
+	<pattern> * </pattern>
+	<template>
+	
+		<think>
+		
+		<addtomap>
+			<name><srai>code <get name="LaSerie"/></srai></name>
+			<key>sinopsis</key>
+			<value><srai> code <star/></srai></value>
+		</addtomap>
+		
+		<set name="topic">sweb</set>
+		
+		</think>
+		
+		Sabria proporcionarme la direccion web?
+	</template>
+</category>
+
+</topic>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<topic name ="sweb" >
+
+<!-- PIDE LA DIRECCION WEB -->
+<category>
+	<pattern> * </pattern>
+	<template>
+	
+		<think>
+		
+		<set var="respuesta"><star/></set>
+		<set var="opcion"><srai>TOP <star/></srai></set>
+		
+		</think>
+		
+		<condition var="opcion">
+			<li value="no">
+				De acuerdo.
+			</li>
+			
+			<li>
+				<think>
+				<addtomap>
+					<name><srai>code <get name="LaSerie"/></srai></name>
+					<key>web</key>
+					<value><get var="respuesta"/></value>
+		   	</addtomap>	
+		   	</think>
+			</li>	
+			
+		 </condition>	
+		 	
+		
+Informacion de la serie <get name="LaSerie"/> aniadida.
+Quiere aniadir algun capitulo? [si/no]
+		
+		<think>
+		
+		<set name="topic">respuestaMaxima</set>
+		
+		</think>
+		
+		
+	</template>
+</category>
+
+</topic>
+
+
+
+
+
+
+
+
+
+
+<!-- TOPIC PARA RESPONDER A LA PREGUNTA DE SI QUIERE ANIADIR O NO UN CAPITULO TRAS ANIADIR UNA SERIE NUEVA -->
+
+<topic name ="respuestaMaxima">
+
+<category>
+	<pattern> * </pattern>
+	<template>
+		<think>
+		<set var="resp"><star/></set>
+		</think>
+		
+		<condition var="resp">
+			<li value="no">
+Vale.
+				<think>
+				<set name="topic">unknown</set>
+				</think>
+			</li>
+			
+			<li>
+De acuerdo. Dime el titulo del capitulo.
+				<think>
+				<set name="Latemporada">temporada1</set>
+				<set name="topic">primercap</set>
+				</think>
+			</li>
+		</condition>
+	</template>
+</category>
+				
+</topic>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- ANIADIR UN NUEVO CAPITULO A UNA TEMPORADA -->
+
+<category>
+	<pattern>Aniad+ un nuevo [capitulo episodio] de la temporada <set>number</set> de (la serie) * </pattern>
+	<template>
+		<think>
+		<set name="LaSerie"><srai> CODE <star index="2"/></srai></set>
+		<set name="Latemporada">temporada<star index="1"/></set>
+		
+		<set var="lista"><readkeys><get name="LaSerie"/></readkeys></set>
+		<set var="existeTemp"><srai> FINDITEM <get name="Latemporada"/> IN <get var="lista"/></srai></set>
+		</think>
+		
+		<condition var="existeTemp">
+			<li value="0">
+Esta temporada no existe
+			</li>
+			
+			<li>
+				<think>
+				<set name="topic">titcap</set>
+				</think>
+Dime el titulo del capitulo
+			</li>
+		</condition>
+	</template>
+</category>
+
+<category>
+	<pattern> Aniad+ un [capitulo episodio] (nuevo) de la temporada <set>number</set> de (la serie) * </pattern>
+	<template>
+		<think>
+		<set name="LaSerie"><srai> CODE <star index="2"/></srai></set>
+		<set var="numtemp"><star index="1"/></set>
+		</think>
+		
+		<srai> ANIADE UN NUEVO CAPITULO DE LA TEMPORADA <get var="numtemp"/> DE <get name="LaSerie"/> </srai>
+	</template>
+</category>
+
+<category>
+	<pattern> Aniad+ otro [capitulo episodio] de la temporada <set>number</set> de (la serie) * </pattern>
+	<template>
+		<think>
+		<set name="LaSerie"><srai> CODE <star index="2"/></srai></set>
+		<set var="numtemp"><star index="1"/></set>
+		</think>
+		
+		<srai> ANIADE UN NUEVO CAPITULO DE LA TEMPORADA <get var="numtemp"/> DE <get name="LaSerie"/> </srai>
+	</template>
+</category>
+
+
+
+
+
+
+<topic name ="titcap">
+
+<!-- PIDE EL NOMBRE DEL CAPITULO -->
+<category>
+	<pattern> * </pattern>
+	<template>
+		<think>
+		<set name="titulo"><star/></set>
+		<set name="topic">durcap</set>
+		</think>
+		
+Dime la duracion del capitulo
+
+	</template>
+</category>
+
+</topic>
+
+<topic name="durcap">
+
+
+
+
+<!-- PIDE LA DURACION DEL CAPITULO -->
+<category>
+	<pattern><set>number</set> ^</pattern>
+	<template>
+		
+		<think>
+		<set name="duracion"><star index="1"/></set>
+		<set var="respuesta"><srai> CODE <get name="titulo"/></srai>@<get name="duracion"/></set>
+		<set var="lista">
+			<map><name><get name="LaSerie"/></name><get name="Latemporada"/></map>
+		</set>
+		
+		<set var="lista">
+			<get var="lista"/>@<get var="respuesta"/>
+		</set>
+		</think>
+		
+		<modifymap>
+			<name><srai>CODE <get name="LaSerie"/></srai></name>
+			<key><get name="Latemporada"/></key>
+			<value><get var="lista"/></value>
+		</modifymap>
+		
+Este capitulo ya esta disponible en la plataforma
+		
+		<think>
+		<set name="topic">unknown</set>
+		</think>
+	</template>
+</category>
+
+</topic>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- ANIADIR EL PRIMER CAPITULO DE UNA TEMPORADA NUEVA -->
+<category>
+	<pattern> aniad+ el primer [capitulo episodio] de la temporada <set>number</set> de (la serie) * </pattern>
+	<template>
+		<think>
+			<set name="LaSerie"><srai>CODE <star index="2"/></srai></set>
+			<set name="Latemporada">temporada<star index="1"/></set>
+			<set name="topic">primercap</set>
+			<set var="lista"><readkeys><get name="LaSerie"/></readkeys></set>
+			<set var="existeTemp"><srai> FINDITEM <get name="Latemporada"/> IN <get var="lista"/></srai></set>
+		</think>
+		
+		<condition var="existeTemp">
+			<li value="0">
+				<think>
+				<set name="topic">primercap</set>
+				</think>
+				
+Dime el titulo del capitulo
+			</li>
+			
+			<li>
+Esta temporada ya existe
+			</li>
+		</condition>
+		
+	</template>
+</category>
+
+
+
+
+
+
+
+
+
+<topic name ="primercap">
+
+<!-- PIDE EL NOMBRE DEL CAPITULO -->
+<category>
+	<pattern> * </pattern>
+	<template>
+		<think>
+		<set name="titulo"><star/></set>
+		<set name="topic">primerdur</set>
+		</think>
+Dime la duracion del capitulo
+	</template>
+</category>
+
+</topic>
+
+
+
+
+
+
+
+<topic name="primerdur">
+
+<!-- PIDE LA DURACION DEL CAPITULO -->
+<category>
+	<pattern><set>number</set> ^</pattern>
+	<template>
+		<think>
+		<set name="duracion"><star/></set>
+		<set var="respuesta"><srai>CODE <get name="titulo"/></srai>@<get name="duracion"/></set>
+	
+		<set name="topic">unknown</set>
+		
+		<addtomap>
+			<name><get name="LaSerie"/></name>
+			<key><get name="Latemporada"/></key>
+			<value><get var="respuesta"/></value>
+		</addtomap>
+		</think>
+Ya se ha aniadido el primer capitulo de la temporada. Si quisiera aniadir otro mas solo pideme que lo aniada.
+		
+	</template>
+</category>
+
+</topic>
+
+
+	
+
+</aiml>

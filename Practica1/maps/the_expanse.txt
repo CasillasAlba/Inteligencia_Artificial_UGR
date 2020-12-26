@@ -1,0 +1,7 @@
+plataforma:prime_video
+genero:fantasia@ciencia_ficcion@biografia
+idiomas:aleman@espanol@ingles@italiano
+subtitulos:espanol@ingles@frances@ruso@chino@japones@polaco
+sinopsis:La_desaparición_de_Julie_Mao,_niña_rica_convertida_en_activista_política,_une_las_vidas_del_detective_de_Ceres,_Joe_Miller_(Thomas_Jane),_el_capitán_de_la_nave,_James_Holden_(Steven_Strait),_y_el_político_de_la_ONU,_Chrisjen_Avasarala_(Shohreh_Aghdashloo)._En_medio_de_toda_la_tensión_política_entre_la_Tierra,_Marte_y_el_Cinturón,_resuelven_la_mayor_conspiración_de_todos_los_tiempos.
+web:www.primevideo.com/detail/0MW6F85MD8486AE43GONNOR5F1/ref=atv_dp_season_select_atf
+temporada1:Dulcinea@45@El_gran_vacio@42@Recordad_el_Canto@42@CBQ@42@De_vuelta_al_carnicero@42@En_las_profundidades@42@Molinos@42@Rescate@41@Masa_critica@39

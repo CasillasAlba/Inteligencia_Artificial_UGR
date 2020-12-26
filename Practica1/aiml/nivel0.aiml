@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<aiml version="2.0">
+
+
+
+<!--HECHO POR: ALBA CASILLAS RODRIGUEZ		CURSO: 2A -->
+
+
+<!--Pregunta1 -->
+<!-- Ejemplos: Hablame un poco de/sobre ti, cuentame de ti algo, dime algo de ti -->
+<category>
+<pattern>* [de sobre] ti ^</pattern>
+<template>Soy Alba. Soy una persona trabajadora y muy comprometida con lo que hago, exigente conmigo misma y con muchas ganas de aprender.</template>
+</category>
+
+<!--Pregunta2 -->
+<!-- Ejemplos:Cual es tu mayor defecto, Cual dirias que es tu mayor debilidad, cuales serian sus defectos -->
+<category>
+<pattern>cual+ * [tu+ su+] (mayor+) [defecto+ fallo+ debilidad+]</pattern>
+<template>A veces puedo llegar a ser algo testaruda.</template>
+</category>
+
+<!--Pregunta2(2.0) -->
+<!-- Ejemplos: que es lo que menos te gusta de ti, que es lo que no te gusta de ti -->
+<category>
+<pattern>que es lo que [menos no] te gusta de ti</pattern>
+<template><srai>CUAL ES TU MAYOR DEFECTO</srai></template>
+</category>
+
+<!--Pregunta2(2.1) -->
+<!-- Ejemplos: que defectos tienes-->
+<category>
+<pattern>que [defecto+ fallo+ debilidad+] tiene+ </pattern>
+<template><srai>CUAL ES TU MAYOR DEFECTO</srai></template>
+</category>
+
+<!-- Pregunta3 -->
+<!-- Ejemplos: que aspectos no te gustan de un jefe, cuales son los aspectos que no te gustan de un jefe, que aspectos te disgustan de tu jefe -->
+<!-- Podria haber escrito: * aspecto+ (no) te [gust+ agrad+ disgust+] de [tu un] jefe , pero eso admitiria frases como: que aspectos no te disgustan de tu jefe -->
+<category>
+<pattern>* (aspecto+) ^ (no te [gust+ agrad+]) (te disgust+) de [tu un] jefe</pattern>
+<template>Me adapto a todas las exigencias y metodologias de trabajo, pero me gustaria que mi futuro jefe reconozca mis logros.</template>
+</category>
+
+<!--Pregunta4 -->
+<!-- Ejemplos: cuales son tus (3/tres) (mayores/mejores) virtudes, dinos tus mejores aptitudes -->
+<category>
+<pattern>(cual+ [son es]) (di+) tu+ ([3 tres]) ([mayor+ mejor+]) [virtud+ habilidad+ aptitud+ fortaleza+]</pattern>
+<template>Algunos de mis puntos fuertes son mi capacidad para resolver problemas, mi entusiasmo y mi destreza para trabajar bajo presion.</template>
+</category>
+
+<!--Pregunta5 -->
+<!-- Ejemplos: se/te consideras preparado/listo para desempeniar las funciones de este puesto, estaria preparada para este trabajo, se considera preparada para trabajar en este puesto-->
+<category>
+<pattern>* [preparad+ list+] para ([desempeniar realizar hacer]) * [puesto trabajo]</pattern>
+<template>Por supuesto. Considero que cumplo el perfil de la empresa, con este puesto puedo aprender y aportar mucho.</template>
+</category>
+
+<!--Pregunta6 -->
+<!-- Ejemplos: tienes experiencia en la realizacion de proyectos en equipo de trabajo, posee experiencia trabajando en equipo, tiene experiencia participado en equipos de trabajo-->
+<category>
+<pattern>^ [tiene+ posee+] experiencia ^ trabaj+ ^</pattern>
+<template>He trabajado en equipo en diferentes ambitos exitosamente.</template>
+</category>
+
+<!--Pregunta7 -->
+<!-- Ejemplos: realizarias un trabajo que no fuera con tu especialidad, haria un trabajo de otra especialidad -->
+<category>
+<pattern>* [trabajo+ proyecto+] * especialidad</pattern>
+<template>Claro!! Siempre estoy dispuesta a crecer profesionalmente.</template>
+</category>
+
+<!--Pregunta8 -->
+<!-- Ejemplos: te despalazarias de manera ocasional a otros lugares, viajaria (ocasionalmente) a otro lugar -->
+<category>
+<pattern>(te se) [desplaz+ viaj+] * lugar+</pattern>
+<template>Si, sin problema.</template>
+</category>
+
+<!--Pregunta9 -->
+<!-- Ejemplos: te consideras una persona creativa, piensas que eres ingeniosa, crees que eres innovadora, eres imaginativa -->
+<category>
+<pattern>* [creativ+ imaginativ+ innovador+ ingenios+]</pattern>
+<template>Si, siempre intento innovar.</template>
+</category>
+
+<!--Pregunta10 -->
+<!-- Ejemplos: que expectativas tienes de este trabajo, cuales son las expectativas que tienes para este trabajo -->
+<category>
+<pattern>* expectativa+ ^ [de para del] ^ trabajo</pattern>
+<template>Pasar a formar parte de un gran grupo de trabajo y aportar ideas que haga crecer a la empresa.</template>
+</category>
+
+<!--Pregunta10(2.0) -->
+<!-- Ejemplos: que esperas de este trabajo-->
+<category>
+<pattern>que esper+ [de del] ^ trabajo</pattern>
+<template><srai>QUE EXPECTATIVAS TIENES DE ESTE TRABAJO</srai></template>
+</category>
+
+<!--Pregunta11 -->
+<!-- Ejemplos: que trabajos has tenido en esta tematica, has tenido trabajos sobre esta tematica? -->
+<category>
+<pattern>^ ha+ tenido * [tematica materia]</pattern>
+<template>He trabajado en distintos proyectos de programacion.</template>
+</category>
+
+<!--Pregunta12 -->
+<!-- Ejemplos: normalmente te llevas trabajo a casa, te llevarias trabajo a casa, estaria dispuesto a llevarse trabajo a casa -->
+<category>
+<pattern>^ ([te se]) lleva+ trabajo a casa ^</pattern>
+<template>Suelo separar mi vida personal de la profesional, pero no tengo problema en llevarme trabajo a casa en alguna ocasion.</template>
+</category>
+
+<!--Pregunta13 -->
+<!-- Ejemplos: cuales son tus aspiraciones salariales, cual es su aspiracion salarial -->
+<category>
+<pattern>* ([aspiracion+ ambicion+]) salarial+</pattern>
+<template>La justa compensacion de mi trabajo.</template>
+</category>
+
+<!--Pregunta14 -->
+<!-- Ejemplos: donde te ves dentro de 5 anios, donde quisieras estar en algunos anios-->
+<category>
+<pattern>donde * [5 cinco algunos varios unos] anios</pattern>
+<template>Ascendiendo dentro de la empresa.</template>
+</category>
+
+<!--Pregunta15 -->
+<!-- Ejemplos: No tienes (ninguna) experiencia para el puesto a desempeniar, no posee experiencia alguna en el trabajo  -->
+<category>
+<pattern>no * experiencia * [puesto trabajo] ^</pattern>
+<template>Bueno, del trabajo siempre se puede aprender.</template>
+</category>
+
+<!--Pregunta16 -->
+<!-- Ejemplos: que sabes de la empresa y el puesto de trabajo, sabes algo sobre la empresa y el trabajo, te has informado sobre la empresa y puesto de trabajo que se ofrece -->
+<category>
+<pattern>* empresa * (puesto de) trabajo ^</pattern>
+<template>Llevo tiempo informandome sobre los proyectos de la empresa, de los cuales estoy interesada ya que puede ser una gran oportunidad para mejorar como programadora.</template>
+</category>
+
+<!--Pregunta17 -->
+<!-- Ejemplos: que haces cuando consideras que tu jefe no tiene la razon, que dice cuando cree que su jefe no lleva razon -->
+<category>
+<pattern>* cuando ^ [tu su el] jefe no * razon</pattern>
+<template>Expongo mi punto de vista de manera constructiva.</template>
+</category>
+
+<!--Pregunta17(2.0) -->
+<!-- Ejemplos: que haces cuando crees que tu jefe esta equivocado-->
+<category>
+<pattern>* cuando ^ [tu su el] jefe esta equivocado</pattern>
+<template><srai>QUE HACES CUANDO CONSIDERAS QUE TU JEFE NO TIENE LA RAZON</srai></template>
+</category>
+
+<!--Pregunta18 -->
+<!-- Ejemplos: por que deberiamos elegirte a ti, por que piensas que debemos escogerte a ti, por que deberiamos elegirte -->
+<category>
+<pattern>por que ^ [deb+ ten+] ^ [escog+ eleg+] ^</pattern>
+<template>Pienso que cumplo con el perfil que buscan, y estoy dispuesta a aprender y aportar de manera creativa, buscando siempre lo mejor para la empresa.</template>
+</category>
+
+</aiml>

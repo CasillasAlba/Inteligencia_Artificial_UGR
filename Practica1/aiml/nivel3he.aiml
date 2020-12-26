@@ -1,0 +1,356 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<aiml version="2.0">
+
+
+
+<!--HECHO POR: ALBA CASILLAS RODRIGUEZ	CURSO: 2A -->
+
+
+<!-- Nivel 3 HABILIDAD ESPECIAL -->
+
+<category>
+<pattern> Ha llegado * </pattern>
+<template>
+	<!-- Compruebo si existe el user -->
+	<think>
+	QUIEN HA LLEGADO <set name="otrouser"><star/></set>
+	SI ES MARTA O CARLOS <set var="existeuser"><srai> FINDITEM <get name="otrouser"/> IN <readset>personas</readset></srai></set>
+	</think>
+	
+	<condition var="existeuser">
+			<li value="0">
+				No creo que te interese ver ninguna serie con esta persona.
+			</li>
+			
+			<li>
+				<think>
+				CLAVES DE TU COMPANIERO
+				<set var="clavescompi"><readkeys><get name="otrouser"/></readkeys></set>
+				SI TU COMPI VE LA SERIE REPRODUCIDA ACTUAL <set var="lave"><srai> FINDITEM <get name="LaSerie"/> IN <get var="clavescompi"/></srai></set>
+				</think>
+				
+				<condition name="noquierecomun">
+					<li value="1000">
+						<think>
+						SI NO QUIERES VER LA SERIE DE CARLOS_Y_MARTA PONEMOS LAVE A 1000
+						<set var="lave">1000</set>
+						</think>
+					</li>
+				</condition>
+				
+				<condition var="lave">
+					<li value="0">
+						<think>
+						COGEMOS LAS CLAVES DE LAS SERIES DE CARLOSYMARTA
+						
+						<set var="comun"><readkeys>carlos_y_marta</readkeys></set>
+						</think>
+						Los dos estais viendo juntos <srai> DECODE <srai> pony <get var="comun"/></srai></srai> , quereis reproducir alguna ahora? [SI/NO]
+						<think>
+						CAMBIAMOS TOPIC
+						<set name="topic">vercomun</set>
+						</think>
+					</li>
+					
+					<li value="1000">
+						<think>
+						CLAVES DE USUARIO 
+						<set var="clavesuser"><readkeys><get name="usuario"/></readkeys></set>
+						SERIE TOP DEL USUARIO
+						<set name="itemserie"><srai> TOP <get var="clavesuser"/></srai></set>
+						<set var="clavesuser"><srai> REMAIN <get var="clavesuser"/></srai></set>
+						
+						<!-- Genero una variable "quedan" que actua a modo de contador -->
+							<set var="quedan"><srai>COUNT <get var="clavesuser"/></srai></set>
+						
+						CLAVES DEL COMPI
+						<set var="clavescompi"><readkeys><get name="otrouser"/></readkeys></set>
+						SI EXISTE LA SERIE TOP DEL USUARIO EN LAS CLAVES DE COMPI-- O SEA MISMA SERIE
+						<set var="existe"><srai> FINDITEM <get name="itemserie"/> IN <get var="clavescompi"/></srai></set>
+				
+						
+						<condition var="existe">
+							<li value="0">
+								<condition var="quedan">
+									<li value="0"></li>
+									
+									<li>
+							
+					     				<set name="itemserie"><srai> TOP <get var="clavesuser"/></srai></set>
+					     				<set var="existe"><srai> FINDITEM <get name="itemserie"/> IN <get var="clavescompi"/></srai></set>
+					     				
+					     				<set var="mayustominus"><readkeys>no_mayusculas</readkeys></set>
+					     				<set var="cambiando"><srai> FINDITEM <get name="itemserie"/> IN <get var="mayustominus"/></srai></set>
+					     				
+					     				<condition var="cambiando">
+					     					<li value="0">
+					     						Esta serie no se puede convertir a mayuscula
+					     					</li>
+					     					
+					     					<li>
+					     						<set var="tmp"><map><name>no_mayusculas</name><get name="itemserie"/></map></set>
+					     						<set name="itemserie"><get var="tmp"/></set>
+					     					</li>
+					     				</condition>
+					     		
+					     			
+					     				<set var="quedan"><srai>COUNT <get var="clavesuser"/></srai></set>
+			
+			     						
+			     					</li>
+			     					
+			     					</condition>
+			     					
+			     					<loop/> 
+			     			</li>
+			     			
+			     			<li>
+			     				<think>
+			     				ASIGNACION DE SERIE EN COMUN
+			     				<set var="haysimilar"><get name="itemserie"/></set>
+			     				</think>
+			     			</li>
+			     		</condition>
+			     		
+			     		</think>
+			     		
+			     		<condition var="haysimilar">
+			     			<li value="$">
+			     				He buscado si ambos teniais mas series en comun y como no he encontrado asumo que no quereis ver nada juntos.
+			     			</li>
+			     			
+			     			<li>
+			     				<think>
+			     				HAY UNA SERIE EN COMUN
+			     				LISTA USUARIO Y NOMBRE DEL CAP DE LA SERIE EN COMUN
+			     				<set var="listauser"><map><name><get name="usuario"/></name><get name="itemserie"/></map></set>
+			     				<set var="listauser"><srai> decode_fields <get var="listauser"/></srai></set>
+			     				<set var="nombrecapuser"><srai> TOP <get var="listauser"/></srai></set>
+			     				LISTA DEL COMPI Y NOMBRE DEL CAP DEL COMPI EN COMUN
+			     				<set var="listacompi"><map><name><get name="otrouser"/></name><get name="itemserie"/></map></set>
+			     				<set var="listacompi"><srai> decode_fields <get var="listacompi"/></srai></set>
+			     				<set var="nombrecapcompi"><srai> TOP <get var="listacompi"/></srai></set>
+			     				</think>
+			     				
+			     				<condition var="nombrecapuser">
+			     					<li><value><get var="nombrecapcompi"/></value>
+			     							<think>
+			     							SI VAN POR EL MISMO CAPITULO
+			     							COMPROBAMOS MINUTOS
+			     							<set var="listauser"><srai> REMAIN <get var="listauser"/></srai></set>
+			     							<set var="mincapuser"><srai> TOP <get var="listauser"/></srai></set>
+			     							<set var="listacompi"><srai> REMAIN <get var="listacompi"/></srai></set>
+			     							<set var="mincapcompi"><srai> TOP <get var="listacompi"/></srai></set>
+			     							<set var="contador">0</set>
+			     							</think>
+			     							
+			     							<condition var="contador">
+			     								<li><value><get var="mincapuser"/></value>
+			     									Ambos estais viendo el capitulo <srai> DECODE <get var="nombrecapuser"/></srai> de la serie <srai> DECODE <get name="itemserie"/></srai> y vais por minutos similares, lo reproduzco por el minuto por el que va <get name="usuario"/> ? [SI/NO]
+			     									<think>
+			     									<set name="personamenormin"><get name="usuario"/></set>
+			     									<set name="topic">responde</set>
+			     									</think>
+			     								</li>
+			     								
+			     								<li><value><get var="mincapcompi"/></value>
+			     									Ambos estais viendo el capitulo <srai> DECODE <get var="nombrecapcompi"/></srai> de la serie <srai> DECODE <get name="itemserie"/></srai> y vais por minutos similares, lo reproduzco por el minuto por el que va <get name="otrouser"/> ? [SI/NO]
+			     									<think>
+			     									<set name="personamenormin"><get name="otrouser"/></set>
+			     									<set name="topic">responde</set>
+			     									</think>
+			     								</li>
+			     								
+			     								<li>
+			     									<think>
+			     									<set var="contador"><map name="successor"><get var="contador"/></map></set>
+			     									</think>
+			     									<loop/>
+			     								</li>
+			     							</condition>
+			     					</li>
+			     					
+			     					<li>
+			     						Aunque ambos estais viendo la serie <srai> DECODE <get name="itemserie"/></srai> , no vais por el mismo capitulo, por lo que no es buena idea que la veais juntos.
+			     						<think>
+										<set name="topic">unknown</set>	
+										</think>		     					
+			     					</li>
+			     					
+			     				</condition>
+			     			</li>
+			     			
+			     		</condition>
+						
+					</li>
+				</condition>
+			</li>
+	</condition>
+	
+</template>
+</category>
+
+
+
+
+
+
+
+
+<!-- TOPIC QUE RESPONDEN A SI QUIEREN VER UNA SERIE JUNTOS -->
+
+<topic name ="vercomun">
+<category>
+	<pattern> * </pattern>
+	<template>
+		<think>
+		<set var="respuesta"><star/></set>
+		</think>
+		
+		<condition var="respuesta">
+			<li value="si">
+				Cual quereis ver?
+				<think>
+				<set name="noquierecommun">0</set>
+				<set name="topic">elegircual</set>
+				</think>
+			</li>
+			
+			<li>
+				De acuerdo.
+				<think>
+				<set name="noquierecomun">1000</set>
+				</think>
+				<srai> HA LLEGADO <get name="otrouser"/></srai>
+			</li>
+		</condition>
+	</template>
+</category>
+
+</topic>
+
+
+
+
+
+
+<!-- SI QUIEREN VER UNA SERIE JUNTOS ELIGEN CUAL -->
+
+<topic name ="elegircual">
+<category>
+	<pattern> * </pattern>
+	<template>
+		<think>
+		<set var="elegida"><srai> CODE <star/></srai></set>
+		<set var="series"><readkeys>carlos_y_marta</readkeys></set>
+		<set var="existe"><srai> FINDITEM <get var="elegida"/> IN <get var="series"/></srai></set>
+		</think>
+		<condition var="existe">
+			<li value="0">
+				La serie elegida no estaba entre las series ofrecidas. Si quisiera elegir otra aviseme otra vez de que ha llegado su companiero.
+			</li>
+			
+			<li>
+			
+				<think>
+				<set var="lista"><map><name>carlos_y_marta</name><get var="elegida"/></map></set> 
+			   <set var="lista"><srai> decode_fields <get var="lista"/></srai></set> 
+			   
+			   <set name="nombrecap"><srai> TOP <get var="lista"/></srai></set>
+				<set var="lista"><srai> REMAIN <get var="lista"/></srai></set>
+				<set name="mincap"><srai> TOP <get var="lista"/></srai></set>
+				
+				<set name="usuario">carlos_y_marta</set>
+				<set name="LaSerie"><srai> CODE <get var="elegida"/></srai></set>
+				
+				
+				<set var="mayustominus"><readkeys>no_mayusculas</readkeys></set>
+  				<set var="cambiando"><srai> FINDITEM <get name="itemserie"/> IN <get var="mayustominus"/></srai></set>
+  				
+  				<condition var="cambiando">
+  					<li value="0">
+  						Esta serie no se puede convertir a mayuscula
+  					</li>
+  					
+  					<li>
+  						<set var="tmp"><map><name>no_mayusculas</name><get name="itemserie"/></map></set>
+  						<set name="itemserie"><get var="tmp"/></set>
+  					</li>
+  				</condition>
+				
+				</think>
+		
+							
+				Reproduciendo <srai> DECODE <get name="LaSerie"/></srai> por el capitulo <srai> DECODE <get name="nombrecap"/></srai> en el minuto <get name="mincap"/>
+			
+			</li>
+		</condition>
+	 </template>
+</category>
+
+</topic>
+			
+
+
+
+<!-- RESPUESTA SI HAY ALGUNA SERIE EN LA QUE VAYAN MAS O MENOS IGUALADOS -->
+
+	
+		
+<topic name ="responde">
+<category>
+	<pattern> * </pattern>
+	<template>
+		<think>
+		<set var="respuesta"><star/></set>
+		</think>
+		
+		<condition var="respuesta">
+			<li value="no">
+Me habeis dicho que no quereis ver ninguna serie que teneis en comun, asi que asumo que no quereis ver nada juntos
+			</li>
+			
+			<li>
+		
+				<think>
+				SERIE  <set name="LaSerie"><get name="itemserie"/></set>
+				LISTA DE VALOR CAP@DUR DE LA SERIE
+				<set var="lista"><map><name><get name="personamenormin"/></name><get name="LaSerie"/></map></set> 
+				<set var="lista"><srai> decode_fields <get var="lista"/></srai></set> 
+				
+				NOMBRE DEL CAP
+				<set name="nombrecap"><srai> TOP <get var="lista"/></srai></set>
+				<set var="lista"><srai> REMAIN <get var="lista"/></srai></set>
+				
+				DURACION DEL CAP
+				<set name="mincap"><srai> TOP <get var="lista"/></srai></set>
+				
+				USUARIO
+				<set name="usuario"><get name="personamenormin"/></set>
+				
+				<condition name="usuario">
+					<li value="marta">
+						<set name="otrouser">carlos</set>
+					</li>
+					
+					<li value="carlos">
+						<set name="otrouser">marta</set>
+					</li>
+				</condition>
+				
+				TEMPORADA
+				<set name="latemporada"><srai> SERIE <get name="LaSerie"/> TEMPORADAPERDIDA <get name="nombrecap"/></srai></set>
+			
+				<set name="modificarambosmap">1</set>
+				</think>
+				Reproduciendo <srai> DECODE <get name="LaSerie"/></srai> por el capitulo <srai> DECODE <get name="nombrecap"/></srai> en el minuto <get name="mincap"/>
+			</li>
+		</condition>
+	</template>
+</category>
+
+</topic>
+				
+				
+
+</aiml>

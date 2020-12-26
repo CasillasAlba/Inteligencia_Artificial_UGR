@@ -1,0 +1,8 @@
+plataforma:netflix
+genero:drama@crimen@suspense
+idiomas:frances@espanol@ingles
+subtitulos:espanol@ingles@frances@ruso@chino@japones
+sinopsis:Ocho_atracadores_toman_rehenes_en_la_fabrica_nacional_de_moneda_y_timbre._Desde_el_encierro_su_lider_manipula_a_la_policia_para_llevar_a_cabo_un_ambicioso_plan
+web:www.netflix.com/es/title/80192098
+temporada1:episodio_1@80@episodio_2@67@episodio_3@63@episodio_4@64@episodio_5@69@episodio_6@74@episodio_7@67@episodio_8@68@episodio_9@72
+temporada2:episodio_1@63

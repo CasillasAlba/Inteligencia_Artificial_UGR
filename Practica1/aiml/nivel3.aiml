@@ -1,0 +1,580 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<aiml version="2.0">
+
+
+
+<!--HECHO POR: ALBA CASILLAS RODRIGUEZ	CURSO: 2A -->
+
+
+<!-- Nivel 3 -->
+
+<!-- REPRODUCIR UNA SERIE -->
+
+<category>
+<pattern> Reproduce (la serie) * </pattern>
+<template> 
+	Vale. Eres Carlos o Marta?
+	<think>
+	<set name="LaSerie"><srai> CODE <star/></srai></set>
+	<set name="topic">identificate</set>
+	</think>
+</template>
+</category>
+
+<topic name ="identificate">
+<category>
+	<pattern> * </pattern>
+	<template>
+		<think>	
+		<set name="usuario"><star/></set>
+		<set var="existeuser"><srai> FINDITEM <get name="usuario"/> IN <readset>personas</readset></srai></set>
+		</think>
+		
+		<condition var="existeuser">
+			<li value="0">
+				Lo siento. Solo estoy programado para hablar con Carlos o Marta.
+			</li>
+			
+			<li>
+				<think>	
+				<set var="claves"><readkeys><get name="usuario"/></readkeys></set>
+				<set var="existe"><srai>FINDITEM <get name="LaSerie"/> IN <get var="claves"/></srai></set>
+				</think>
+				
+				<condition var="existe">
+					<li value="0">
+						<think>	
+						<set var="clavescomp"><readkeys>carlos_y_marta</readkeys></set>
+						<set var="existecomp"><srai>FINDITEM <get name="LaSerie"/> IN <get var="clavescomp"/></srai></set>
+						</think>
+						
+						<condition var="existecomp">
+							<li value="0">
+								Pero <get name="usuario"/> , tu no estas viendo esta serie! Quieres que la aniada a tu lista de reproducciones?[SI/NO]
+								<think>
+									<set name="topic">aniadeEnLista</set>
+								</think>
+							</li>
+							
+							<li>
+								<think>
+								<condition name="usuario">
+									<li value="Carlos">
+										<set name="otrouser">Marta</set>
+									</li>
+									
+									<li value="Marta">
+										<set name="otrouser">Carlos</set>
+									</li>
+								</condition>
+								</think>
+								
+								<get name="usuario"/> , esta serie la estas viendo con tu compi <get name="otrouser"/> , espera a que el/ella llegue para continuarla
+							</li>
+						 </condition>
+						
+					</li>
+					
+					<li>
+						<think>
+						   <set var="lista"><map><name><get name="usuario"/></name><get name="LaSerie"/></map></set> 
+						   <set var="lista"><srai> decode_fields <get var="lista"/></srai></set> 
+						   
+						   <set name="nombrecap"><srai> TOP <get var="lista"/></srai></set>
+							<set var="lista"><srai> REMAIN <get var="lista"/></srai></set>
+							<set name="mincap"><srai> TOP <get var="lista"/></srai></set>
+							
+							<set var="contador">1</set>
+							<set name="latemporada">temporada<get var="contador"/></set>
+							<set var="listemp"><map><name><get name="LaSerie"/></name><get name="latemporada"/></map></set>
+							<set var="listemp"><srai> decode_fields <get var="listemp"/></srai></set>
+						   <set var="buscatemp"><srai> FINDITEM <get name="nombrecap"/> IN <get var="listemp"/></srai></set> 
+					   </think>
+					   
+					   <condition var="buscatemp">
+							<li value="0">
+								<think>
+									<set var="contador"><map name="successor"><get var="contador"/></map></set>
+									<set name="latemporada">temporada<get var="contador"/></set>
+									<set var="listemp"><map><name><get name="LaSerie"/></name><get name="latemporada"/></map></set>
+									<set var="buscatemp"><srai> FINDITEM <get name="nombrecap"/> IN <get var="listemp"/></srai></set>
+								</think>
+								<loop/>
+							</li>
+							
+							<li>
+Reproduciendo <srai> DECODE <get name="nombrecap"/></srai> , capitulo de la temporada <get var="contador"/> de la serie <srai> DECODE <get name="LaSerie"/></srai> por el minuto <get name="mincap"/> , donde lo dejaste la ultima vez.
+							<think>
+							<!-- Variable global para controlar que la reproduccion este activdada -->
+							<set name="reproduccionactivada">1</set>
+							</think>
+							</li>
+						</condition>
+					</li>
+				</condition>
+			</li>
+		</condition>
+	</template>
+</category>
+
+</topic>
+
+
+
+
+
+
+<!-- TOPIC QUE RESPONDE A SI QUIERE ANIADIR UNA SERIE QUE NO EXISTE Y SE HA INTENTADO REPRODUCIR -->
+
+<topic name="aniadeEnLista">
+
+<category>
+	<pattern> * </pattern>
+	<template>
+		<think>
+			<set var="respuesta"><star/></set>
+		</think>
+		
+		<condition var="respuesta">
+			<li value="No">
+De acuerdo.
+			</li>
+			
+			<li value="Si">
+				<think>
+					<set var="numtemporada">temporada1</set>
+					<set var="lista"><map><name><get name="LaSerie"/></name><get var="numtemporada"/></map></set>
+					
+					<set var="lista"><srai> decode_fields <get var="lista"/></srai></set>
+					<set var="item"><srai> TOP <get var="lista"/></srai></set>
+					<set var="capitulo"><get var="item"/>@0</set>
+					
+					<addtomap>
+						<name><get name="usuario"/></name>
+						<key><get name="LaSerie"/></key>
+						<value><get var="capitulo"/></value>
+					</addtomap>
+				</think>
+				
+Ya he aniadido la serie a tu lista.
+			</li>
+			
+		</condition>
+		
+		<think>
+		<set name="topic">unknown</set>
+		</think>
+		
+	</template>
+</category>
+
+</topic>
+
+
+
+
+
+
+
+
+
+<!-- PREPRODUCIR EL CAPITULO ACTUAL DE UNA SERIE POR UN MINUTO EN CONCRETO -->
+
+<category>
+<pattern> Reproduce el capitulo actual de (la serie) * por el minuto <set>number</set> </pattern>
+<template> 
+	Vale. Eres Carlos o Marta?
+	<think>
+		<set name="LaSerie"><srai> CODE <star index="1"/></srai></set>
+		<set name="nuevominuto"><star index="2"/></set>
+		<set name="topic">identificate2</set>
+	</think>
+</template>
+</category>
+
+<topic name ="identificate2">
+<category>
+	<pattern> * </pattern>
+	<template>
+		<think>	
+			<set name="usuario"><star/></set>
+			<set var="existeuser"><srai> FINDITEM <get name="usuario"/> IN <readset>personas</readset></srai></set>
+		</think>
+		
+		<condition var="existeuser">
+			<li value="0">
+Lo siento. Solo estoy programado para hablar con Carlos o Marta.
+			</li>
+			
+			<li>	
+			
+			<think>
+				<set var="claves"><readkeys><get name="usuario"/></readkeys></set>
+				<set var="existe"><srai>FINDITEM <get name="LaSerie"/> IN <get var="claves"/></srai></set>
+			</think>
+			
+				<condition var="existe">
+					<li value="0">
+						<think>	
+						<set var="clavescomp"><readkeys>carlos_y_marta</readkeys></set>
+						<set var="existecomp"><srai>FINDITEM <get name="LaSerie"/> IN <get var="clavescomp"/></srai></set>
+						</think>
+						
+						<condition var="existecomp">
+							<li value="0">
+								Pero <get name="usuario"/> , tu no estas viendo esta serie! Quieres que la aniada a tu lista de reproducciones?[SI/NO]
+								<think>
+									<set name="topic">aniadeEnLista</set>
+								</think>
+							</li>
+							
+							<li>
+								<think>
+								<condition name="usuario">
+									<li value="Carlos">
+										<set name="otrouser">Marta</set>
+									</li>
+									
+									<li value="Marta">
+										<set name="otrouser">Carlos</set>
+									</li>
+								</condition>
+								</think>
+								
+								<get name="usuario"/> , esta serie la estas viendo con tu compi <get name="otrouser"/> , espera a que el/ella llegue para continuarla
+							</li>
+						 </condition>
+					</li>
+						
+					<li>
+							<think>
+								<set var="lista"><map><name><get name="usuario"/></name><get name="LaSerie"/></map></set> 
+							   <set var="lista"><srai> decode_fields <get var="lista"/></srai></set> 
+							   
+							   <set name="nombrecap"><srai> TOP <get var="lista"/></srai></set>
+								<set var="lista"><srai> REMAIN <get var="lista"/></srai></set>
+								<set name="mincap"><srai> TOP <get var="lista"/></srai></set>
+								
+								<set var="capitulo"><get name="nombrecap"/>@<get name="nuevominuto"/></set>
+							</think>
+							
+Reproduciendo el capitulo <srai> DECODE <get name="nombrecap"/></srai> , el cual iba por el minuto <get name="mincap"/> , de la serie <srai> DECODE <get name="LaSerie"/></srai>, ahora por el minuto <get name="nuevominuto"/> .
+							
+							<think>
+							<modifymap>
+								<name><get name="usuario"/></name>
+								<key><get name="LaSerie"/></key>
+								<value><get var="capitulo"/></value>
+							</modifymap>
+							
+							<set name="mincap"><get name="nuevominuto"/></set>
+							
+
+							<!-- Variable global para controlar que la reproduccion este activdada -->
+							<set name="reproduccionactivada">1</set>
+							
+							</think>
+					</li>
+			</condition>
+	  	 </li>
+		</condition>
+	</template>
+</category>
+
+</topic>
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- REPRODUCIR EL SIGUIENTE CAPITULO -->
+
+<category>
+<pattern> Reproduce el siguiente capitulo </pattern>
+<template>
+	<condition name="reproduccionactivada">
+		<li value="1">
+				<think>
+					<set var="listemp"><map><name><get name="LaSerie"/></name><get name="latemporada"/></map></set>
+					<set var="listemp"><srai> decode_fields <get var="listemp"/></srai></set>
+					<set var="poscap"><srai> FINDITEM <get name="nombrecap"/> IN <get var="listemp"/></srai></set> 
+					<set var="acontar"><map name="successor"><get var="poscap"/></map></set>
+					<set var="contar">0</set>
+				</think>
+				
+				<condition var="contar">
+					<li><value><get var="acontar"/></value></li>
+					
+					<li>
+						<think>
+							<set var="contar"><map name="successor"><get var="contar"/></map></set>
+							<set var="listemp"><srai> REMAIN <get var="listemp"/></srai></set>
+						</think>
+						
+						<loop/>
+					</li>
+				</condition>
+				
+				<think>
+				<set var="numelem"><srai> COUNT <get var="listemp"/></srai></set>
+				</think>
+				
+				<condition var="numelem">
+					<li value="0">
+						<think>
+							<set var="cambiotemporada"><srai> DELETREA <get name="latemporada"/></srai></set>
+							<set var="letras"><srai> COUNT <get var="cambiotemporada"/></srai></set>
+							<set var="numtemp"><srai> SELECTITEM <get var="letras"/> IN <get var="cambiotemporada"/></srai></set>
+							<set var="numtemp"><map name="successor"><get var="numtemp"/></map></set>
+							<set name="latemporada">temporada<get var="numtemp"/></set>
+							
+							<set var="claves"><readkeys><get name="LaSerie"/></readkeys></set>
+							<set var="existe"><srai> FINDITEM <get name="latemporada"/> IN <get var="claves"/></srai></set> 
+						</think>
+						
+						<condition var="existe">
+							<li value="0">
+Ya no hay mas capitulos de esta serie
+								
+								<removefrommap>
+									<name><get name="usuario"/></name>
+									<key><get name="LaSerie"/></key>
+								</removefrommap>
+							</li>
+							
+							<li>
+								<think>
+									<set var="listemp"><map><name><get name="LaSerie"/></name><get name="latemporada"/></map></set>
+									<set var="listemp"><srai> decode_fields <get var="listemp"/></srai></set>
+									<set name="nombrecap"><srai> TOP <get var="listemp"/></srai></set>
+									<set var="listemp"><srai> REMAIN <get var="listemp"/></srai></set>
+									<set name="mincap">0</set>
+									
+									<set var="capitulo"><get name="nombrecap"/>@<get name="mincap"/></set>
+							
+							
+									<modifymap>
+										<name><get name="usuario"/></name>
+										<key><get name="LaSerie"/></key>
+										<value><get var="capitulo"/></value>
+									</modifymap>
+								</think>
+								
+Reproduciendo una nueva temporada, capitulo: <srai>DECODE <get name="nombrecap"/></srai> por el minuto <get name="mincap"/>
+							</li>
+						</condition>
+					</li>
+					
+					<li>
+						<think>
+							<set name="nombrecap"><srai> TOP <get var="listemp"/></srai></set>
+							<set var="listemp"><srai> REMAIN <get var="listemp"/></srai></set>
+							<set name="mincap">0</set>
+							
+							<set var="capitulo"><get name="nombrecap"/>@<get name="mincap"/></set>
+							
+							
+							<modifymap>
+								<name><get name="usuario"/></name>
+								<key><get name="LaSerie"/></key>
+								<value><get var="capitulo"/></value>
+							</modifymap>
+						</think>	
+						
+Reproduciendo el siguiente capitulo: <srai> DECODE <get name="nombrecap"/></srai> por el minuto <get name="mincap"/>
+					</li>
+				</condition>
+			</li>
+		
+			<li>
+No tienes el modo de reproduccion activado.
+			</li>
+		</condition>
+</template>
+</category>
+			
+	
+	
+
+
+
+
+
+
+
+
+
+
+
+<!-- SELECCIONAR IDIOMA -->
+
+<category>
+<pattern> Pon el idioma en * </pattern>
+<template>
+	<condition name="reproduccionactivada">
+	<li value="1">
+			<think>
+			<set var="selecidioma"><star/></set>
+			
+			<set var="listidiomas"><map><name><get name="LaSerie"/></name>idiomas</map></set>
+			<set var="listidiomas"><srai>decode_fields <get var="listidiomas"/></srai></set>
+			<set var="buscaidioma"><srai> FINDITEM <get var="selecidioma"/> IN <get var="listidiomas"/></srai></set>
+			</think>
+			
+			<condition var="buscaidioma">
+				<li value="0">
+		La serie actual no se encuentra en <star/>, puedes elegir entre <srai> pony <get var="listidiomas"/></srai>
+				</li>
+			
+				<li>
+		Se ha puesto el audio de la serie en <star/>.
+				</li>
+			</condition>
+	</li>
+	
+	<li>
+No se esta reproduciendo ningun capitulo	
+	</li>
+	</condition>
+</template>
+</category>
+
+<category>
+<pattern> Cambia el idioma a * </pattern>
+<template>
+	<think>
+	<set var="selecidioma"><star/></set>
+	</think>
+	
+	<srai> PON EL IDIOMA EN <get var="selecidioma"/></srai>
+</template>
+</category>
+
+
+
+
+
+
+
+
+
+<!-- SELECCIONAR SUBTITULOS -->
+
+<category>
+<pattern> Pon los subtitulos en * </pattern>
+<template>
+	<condition name="reproduccionactivada">
+	<li value="1">
+		<think>
+			<set name="subactivados">1</set>
+			<set var="selecsub"><star/></set>
+			
+			<set var="listsubs"><map><name><get name="LaSerie"/></name>subtitulos</map></set>
+			<set var="listsubs"><srai>decode_fields <get var="listsubs"/></srai></set>
+			<set var="buscasub"><srai> FINDITEM <get var="selecsub"/> IN <get var="listsubs"/></srai></set>
+		</think>
+		
+		<condition var="buscasub">
+			<li value="0">
+	La serie actual no tiene subtitulos en <star/>, puedes elegir entre <srai> pony <get var="listsubs"/></srai>
+			</li>
+		
+			<li>
+	Se han puesto los subtitulos de la serie en <star/>.
+			</li>
+		</condition>
+	</li>
+	
+	<li>
+No se esta reproduciendo ningun capitulo
+	</li>
+</condition>
+</template>
+</category>
+
+
+
+
+
+
+
+<!-- DESACTIVAR LOS SUBTITULOS -->
+
+
+<category>
+<pattern> Desactiva los subtitulos </pattern>
+<template>
+
+	<condition name="reproduccionactivada">
+		<li value="1">
+			<condition  name="subactivados">
+				<li value="1">
+					De acuerdo. Ya he desactivado los subtitulos
+					<think>
+						<set name="subactivados">0</set>
+					</think>
+				</li>
+				
+				<li>
+					Los subtitulos no estan activados
+				</li>
+			</condition>
+		</li>
+		
+		<li>
+No se esta reproduciendo ningun capitulo
+		</li>
+	</condition>
+</template>
+</category>
+
+
+
+
+
+<!-- CIERRE DE REPRODUCCION Y APLICACION -->
+
+
+<category>
+<pattern> Cerrar reproduccion </pattern>
+<template>
+	<condition name="reproduccionactivada">
+		<li value="1">
+			 Reproduccion cerrada. 
+		</li>
+		
+		<li>
+			No se ha iniciado aun la reproduccion
+		</li>
+	 </condition>
+	 </template>
+</category>	
+
+<category>
+<pattern> Para la reproduccion </pattern>
+<template>
+	<srai> CERRAR REPRODUCCION </srai>
+</template>
+</category>
+
+<category>
+<pattern> Deten la reproduccion </pattern>
+<template>
+	<srai> CERRAR REPRODUCCION </srai>
+</template>
+</category>
+	
+
+<category>
+<pattern> [Cerrar Cierra] (la) aplicacion </pattern>
+<template> Aplicacion cerrada. </template>
+</category>					
+
+</aiml>

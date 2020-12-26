@@ -1,0 +1,570 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<aiml version="2.0">
+
+
+
+<!--HECHO POR: ALBA CASILLAS RODRIGUEZ		CURSO: 2A -->
+
+<!--Nivel 2 -->
+
+
+<!-- PREGUNTAR DE QUE TRATA UNA SERIE -->
+
+<category>
+	<pattern> De que [va trata] (la serie) * </pattern>
+	<template>
+		<think>
+			<set name="LaSerie"><srai> CODE <star/></srai></set>
+			
+			<set var="existe"><srai> FINDITEM <get name="LaSerie"/> IN <readset>seriesnetflix</readset></srai></set>
+		</think>
+		
+		<condition var="existe">
+			<li value="0">
+					<think>
+					<set var="existe2"><srai> FINDITEM <get name="LaSerie"/> IN <readset>primevideo</readset></srai></set>
+					</think>
+					
+					<condition var="existe2">
+						<li value="0">
+							La serie <star/> no esta en el catalogo.Quieres aniadirla? [Si/No]
+		
+							<think>
+								<set name="topic">quereraniadir</set>	
+							</think>
+												
+						</li>
+						
+						<li>
+							Sinopsis: <srai>decode <map><name><get name="LaSerie"/></name>sinopsis</map></srai>
+						</li>
+						
+					</condition>
+			</li>
+			
+			<li>
+				Sinopsis: <srai>decode <map><name><get name="LaSerie"/></name>sinopsis</map></srai>
+			</li>
+			
+		</condition>
+	</template>
+</category>
+
+
+
+
+
+
+<!-- TOPIC QUE RESPONDE SI SE QUIERE ANIADIR UNA SERIE POR LA CUAL SE HA PREGUNTADO INFORMACION Y NO EXISTE -->
+
+<topic name ="quereraniadir">
+<category>
+	<pattern> * </pattern>
+	<template>
+		<think>
+			<set var="respuesta"><star/></set>
+		</think>
+		
+		<condition var="respuesta">
+			<li value="si">
+				De acuerdo. Ha creado un archivo txt con el nombre de la serie? [Si/No]
+							
+				<think>
+					<set name="topic">archivocreado</set>	
+				</think>
+			</li>
+			
+			<li value="no">
+				De acuerdo.
+				<think>
+				<set name="topic">unknown</set>
+				</think>
+			</li>
+		</condition>
+	</template>
+</category>
+
+</topic>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- PREGUNTAR LOS IDIOMAS O SUBTITULOS DE UNA SERIE -->		
+		
+<category>
+	<pattern> En que * esta (la serie) * </pattern>
+	<template>
+		<think>
+			<set name="LaSerie"><srai> CODE <star index="2"/></srai></set>
+			<set var="aBuscar"><star index="1"/></set>
+					
+			<set var="existe"><srai> FINDITEM <get name="LaSerie"/> IN <readset>seriesnetflix</readset></srai></set>
+		</think>
+		
+		<condition var="existe">
+			<li value="0">
+					<think>
+					<set var="existe2"><srai> FINDITEM <get name="LaSerie"/> IN <readset>primevideo</readset></srai></set>
+					</think>
+					
+					<condition var="existe2">
+						<li value="0">
+							La serie <get name="LaSerie"/> no esta en el catalogo.Quieres aniadirla? [Si/No]
+		
+							<think>
+								<set name="topic">quereraniadir</set>	
+							</think>
+												
+						</li>
+						
+						<li>
+									
+							<think>
+								<set var="tmp"><map><name><get name="LaSerie"/></name><get var="aBuscar"/></map></set>
+							</think>
+							
+							<srai>pony <srai>decode_fields <get var="tmp"/></srai></srai>
+							
+						</li>
+						
+					</condition>
+			</li>
+			
+			<li>
+				<think>
+					<set var="tmp"><map><name><get name="LaSerie"/></name><get var="aBuscar"/></map></set>
+				</think>
+							
+				<srai>pony <srai>decode_fields <get var="tmp"/></srai></srai>
+			</li>
+			
+		</condition>
+	</template>
+</category>
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- PREGUNTAR SI UNA SERIE ESTA EN UN IDIOMA EN CONCRETO -->		
+		
+<category>
+	<pattern> (la serie) * (esta) (se encuentra) en * </pattern>
+	<template>
+		<think>
+			<set name="LaSerie"><srai> CODE <star index="1"/></srai></set>
+			<set var="elIdioma"><star index="2"/></set>
+			
+			<set var="lidiomas">
+				<srai> decode_fields <map><name><srai> CODE <get name="LaSerie"/></srai></name>idiomas</map></srai>
+			</set>
+			
+			<set var="item">
+				<srai> FINDITEM <get var="elIdioma"/> IN <get var="lidiomas"/></srai>
+			</set>
+		</think>
+		
+		<condition var="item">
+			<li value="0">
+				No, <star index="1"/> no se encuentra en <get var="elIdioma"/>
+			</li>
+			
+			<li>
+				Si, <star index="1"/> se encuentra en <get var="elIdioma"/>
+			</li>
+		</condition>
+	</template>
+</category>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+			
+			
+<!-- PREGUNTAR CUANTOS IDIOMAS TIENE UNA SERIE -->
+
+<category>
+<pattern> ^ cuantos idiomas [esta tiene] (la serie) * </pattern>
+<template>
+		<think>
+		<set name="LaSerie"><srai> CODE <star index="2"/></srai></set>
+		<set var="lista">
+			<map><name><get name="LaSerie"/></name>idiomas</map>
+		</set>
+		<set var="lista"><srai> decode_fields <get var="lista"/></srai></set>
+		
+		<set var="contador"><srai> COUNT <get var="lista"/></srai></set>
+		</think>
+		
+		La serie <srai> DECODE <get name="LaSerie"/></srai> esta en <get var="contador"/> idiomas
+</template>
+</category>
+
+
+
+
+
+
+
+
+
+
+<!-- PREGUNTAR CUANTOS SUBTITULOS TIENE UNA SERIE -->
+
+<category>
+<pattern> ^ cuantos subtitulos [esta tiene] (la serie) * </pattern>
+<template>
+		<think>
+		<set name="LaSerie"><srai> CODE <star index="2"/></srai></set>
+		<set var="lista">
+			<map><name><get name="LaSerie"/></name>subtitulos</map>
+		</set>
+		<set var="lista"><srai> decode_fields <get var="lista"/></srai></set>
+		
+		<set var="contador"><srai> COUNT <get var="lista"/></srai></set>
+		</think>
+		
+		La serie <srai> DECODE <get name="LaSerie"/></srai> esta en <get var="contador"/> subtitulos
+</template>
+</category>
+
+
+
+
+
+
+
+
+
+
+
+<!-- PREGUNTAR CUANTOS CAPITULOS TOTALES TIENE UNA SERIE -->
+
+<category>
+	<pattern> cuantos capitulos [tiene hay] en total (de) (la serie) * </pattern>
+	<template>
+			<think>
+			<set name="LaSerie"><srai> CODE <star/></srai></set>
+			<set var="claves"><readkeys><get name="LaSerie"/></readkeys></set>
+			<set var="contadorTemp">1</set>
+			<set var="temp">temporada<get var="contadorTemp"/></set>
+			<set var="existe"><srai>FINDITEM <get var="temp"/> IN <get var="claves"/></srai></set>
+			<set var="respuesta">0</set>
+			</think>
+
+			<condition var="existe">
+				<li value="0">
+					La serie <srai> DECODE <get name="LaSerie"/></srai> tiene <get var="respuesta"/> capitulos en total
+				</li>
+				
+				<li>
+				
+					<think>
+					<set var="caps"><srai> decode_fields <map><name><get name="LaSerie"/></name><get var="temp"/></map></srai></set>
+					<set var="tamcaps"><srai> COUNT <get var="caps"/></srai></set>
+					<set var="cuentacaps">0</set>
+					</think>
+					
+					<condition var="cuentacaps">
+						<li><value><get var="tamcaps"/></value></li>
+						
+						<li>
+							<think>
+							<set var="cuentacaps"><map name="successor"><get var="cuentacaps"/></map></set>
+							<set var="cuentacaps"><map name="successor"><get var="cuentacaps"/></map></set>
+							<set var="respuesta"><map name="successor"><get var="respuesta"/></map></set>
+							</think>
+							<loop/>
+						
+						</li>
+					</condition>
+					<think>
+					<set var="contadorTemp"><map name="successor"><get var="contadorTemp"/></map></set>
+					<set var="temp">temporada<get var="contadorTemp"/></set>
+					<set var="existe"><srai>FINDITEM <get var="temp"/> IN <get var="claves"/></srai></set>
+					</think>
+					<loop/>
+				</li>
+			</condition>
+	</template>
+</category>
+
+
+
+
+
+
+
+
+
+<!-- PREGUNTAR CUANTOS CAPITULOS TIENE UNA SERIE EN UNA TEMPORADA EN CONCRETO -->
+
+<category>
+	<pattern> cuantos capitulos tiene la temporada <set>number</set> de (la serie) * </pattern>
+	<template>
+		<think>
+		<set name="LaSerie"><srai> CODE <star index="2"/></srai></set>
+		<set var="temp">temporada<star index="1"/></set>
+		<set var="caps"><srai> decode_fields <map><name><get name="LaSerie"/></name><get var="temp"/></map></srai></set>
+		<set var="tamcaps"><srai> COUNT <get var="caps"/></srai></set>
+		<set var="cuentacaps">0</set>
+		<set var="respuesta">0</set>
+		<set var="claves"><readkeys><get name="LaSerie"/></readkeys></set>
+		<set var="existe"><srai> FINDITEM <get var="temp"/> IN <get var="claves"/></srai></set>
+		</think>
+		
+		<condition var="existe">
+			<li value="0">
+Lo siento, esta temporada no existe.
+			</li>
+			
+			<li>
+				
+				<condition var="cuentacaps">
+								<li><value><get var="tamcaps"/></value> La serie <star index="2"/> tiene <get var="respuesta"/> capitulos </li>
+								
+								<li>
+									<think>
+									<set var="cuentacaps"><map name="successor"><get var="cuentacaps"/></map></set>
+									<set var="cuentacaps"><map name="successor"><get var="cuentacaps"/></map></set>
+									<set var="respuesta"><map name="successor"><get var="respuesta"/></map></set>
+									</think>
+									
+									<loop/>
+								
+								</li>
+					</condition>
+				</li>
+			</condition>
+		</template>
+</category>
+					
+
+
+
+
+
+
+
+
+
+
+<!-- PREGUNTAR EL NUMERO DE TEMPORADAS DE UNA SERIE -->		
+		
+<category>
+	<pattern> cuantas temporadas tiene (la serie) * </pattern>
+		<template>
+		
+			<think>
+			<set name="LaSerie"><srai> CODE <star/></srai></set>
+			<set var="temporadas"><readkeys><get name="LaSerie"/></readkeys></set>
+			<set var="contador">1</set>
+			<set var="item">temporada<get var="contador"/></set>
+			<set var="existe"><srai>FINDITEM <get var="item"/> IN <get var="temporadas"/></srai></set>
+			</think>
+		
+		
+		<condition var="existe">
+			<li value="0">
+				<think>
+				<set var="totales"><map name="predecessor"><get var="contador"/></map></set>
+				</think>
+				
+				La serie <star/> tiene <get var="totales"/>  temporadas
+				
+			</li>
+			
+			<li>
+			  <think>
+				<set var="contador"><map name="successor"><get var="contador"/></map></set>
+				<set var="item">temporada<get var="contador"/></set>
+				<set var="existe"><srai>FINDITEM <get var="item"/> IN <get var="temporadas"/></srai></set>
+			  </think>
+			
+			<loop/>
+			</li>
+		</condition>
+		</template>
+</category>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+
+<!-- PREGUNTAR POR EL NOMBRE DE UN CAPITULO CONCRETO -->
+
+<category>
+	<pattern>como se llama el capitulo <set>number</set> de la temporada <set>number</set> de (la serie) * </pattern>
+	<template>
+	
+		<think>
+			<set name="LaSerie"><srai> CODE <star index="3"/></srai></set>
+			<set var="numtemporada">temporada<star index="2"/></set>
+			<set var="lista"><map><name><get name="LaSerie"/></name><get var="numtemporada"/></map></set>
+			<set var="lista"><srai> decode_fields <get var="lista"/></srai></set>
+			<set var="contador">1</set>
+		</think>
+		
+			
+			<condition var="contador">
+				<li><value><star index="1"/></value>
+				 <think>
+					<set var="titulo"><srai> TOP <get var="lista"/> </srai></set>
+				 </think>
+				 		
+				</li>
+				
+				<li>
+					<think>
+					
+					<set var="contador"><map name="successor"><get var="contador"/></map></set>
+					<set var="lista"><srai> REMAIN <get var="lista"/></srai></set>
+					<set var="lista"><srai> REMAIN <get var="lista"/></srai></set>
+					
+					</think>
+				 <loop/>
+				</li>
+			</condition>
+			
+			<condition var="titulo">
+				<li value="$">
+					Lo siento mucho pero este capitulo no existe
+				</li>
+				
+				<li>
+					El capitulo se llama: <srai> DECODE <get var="titulo"/></srai>
+				</li>
+			</condition>
+					
+		</template>
+</category>
+
+<category>
+	<pattern>dime el [nombre titulo] del capitulo <set>number</set> de la temporada <set>number</set> de (la serie) * </pattern>
+	<template>
+		<think>
+			<set name="LaSerie"><srai> CODE <star index="3"/></srai></set>
+			<set var="numcap"><star index= "1"/></set>
+			<set var="numtemp"><star index="2"/></set>
+		</think>
+			
+		<srai>COMO SE LLAMA EL CAPITULO <get var="numcap"/> DE LA TEMPORADA <get var="numtemp"/> DE LA SERIE <get name="LaSerie"/></srai>
+		</template>
+</category>
+
+<category>
+	<pattern>que [nombre titulo] tiene el capitulo <set>number</set> de la temporada <set>number</set> de (la serie) * </pattern>
+	<template>
+		<think>
+			<set name="LaSerie"><srai> CODE <star index="3"/></srai></set>
+			<set var="numcap"><star index= "1"/></set>
+			<set var="numtemp"><star index="2"/></set>
+		</think>
+			
+		<srai>COMO SE LLAMA EL CAPITULO <get var="numcap"/> DE LA TEMPORADA <get var="numtemp"/> DE LA SERIE <get name="LaSerie"/></srai>
+		</template>
+</category>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- PREGUNTAR POR LA DURACION DE UN CAPITULO CONCRETO -->
+
+<category>
+	<pattern>cuanto dura el capitulo <set>number</set> de la temporada <set>number</set> de (la serie) * </pattern>
+	<template>
+	
+			<think>
+			<set name="LaSerie"><srai> CODE <star index="3"/></srai></set>
+			<set var="numtemporada">temporada<star index="2"/></set>
+			<set var="lista"><map><name><get name="LaSerie"/></name><get var="numtemporada"/></map></set>
+			<set var="lista"><srai> decode_fields <get var="lista"/></srai></set>
+			<set var="contador">1</set>
+			</think>
+		
+			
+			<condition var="contador">
+			
+				<li><value><star index="1"/></value>
+				<think>
+				<set var="lista"><srai> REMAIN <get var="lista"/></srai></set>
+				duracion	<set var="duracion"><srai> TOP <get var="lista"/> </srai></set>
+				</think>
+				 
+				 		
+				</li>
+				
+				<li>
+					<think>
+					<set var="contador"><map name="successor"><get var="contador"/></map></set>
+					<set var="lista"><srai> REMAIN <get var="lista"/></srai></set>
+					<set var="lista"><srai> REMAIN <get var="lista"/></srai></set>
+					</think>
+					
+				 <loop/>
+				</li>
+			</condition>
+			
+			<condition var="duracion">
+				<li value="$">
+					Lo siento mucho pero este capitulo no existe
+				</li>
+				
+				<li>
+						El capitulo dura <srai> DECODE <get var="duracion"/></srai> minutos
+				</li>
+			</condition>
+					
+		</template>
+</category>
+
+</aiml>
